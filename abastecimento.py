@@ -57,9 +57,9 @@ df_filtrado = df_filtrado[
     (df_filtrado['Data Final'].dt.date <= data_fim)
 ]
 
-st.title("📊 Dashboard de Abastecimentos")
+total_abastecimentos = df_filtrado.shape[0]
 
-# --- Total de Abastecimentos por Empilhador ---
+st.title("Dashboard de Abastecimentos")
 
 
 # --- Total de Abastecimentos por Setor ---
@@ -67,92 +67,137 @@ st.title("📊 Dashboard de Abastecimentos")
 
 
 
-col1, col2 = st.columns(2)
+col1,col2 = st.columns(2)
+
 
 with col1:
+        
+        
 
-    st.header("1️⃣ Total de Abastecimentos por Empilhador")
+    st.markdown(
+        f"""
+        <div style="
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 120px;
+            width: 100%;
+            background-color: #FFFAFA;
+            border-radius: 15px;
+            box-shadow: 3px 3px 20px rgba(0, 0, 0, 0.1);
+            font-size: 18px;
+            font-weight: bold;
+            color: black;
+            text-align: center;
+            padding: 16px;
+            margin-bottom: 20px;">
+            <div>Total de Abastecimentos</div>
+            <div style="font-size: 32px; margin-top: 10px;">{total_abastecimentos}</div>
+        </div>
+        """,
+        unsafe_allow_html=True)
+    
 
-total_abastecimento = df_filtrado.groupby('Úsuario').size().reset_index(name='Quantidade').sort_values(by='Quantidade', ascending=False)
 
-if not total_abastecimento.empty:
-    chart1 = alt.Chart(total_abastecimento).mark_bar().encode(
-        y=alt.Y('Úsuario:N', sort='-x', title='Empilhador'),
-        x=alt.X('Quantidade:Q', title='Quantidade de Abastecimentos'),
-        tooltip=['Úsuario', 'Quantidade']
-    ).properties(
-        width=600,
-        height=400
-    )
 
-    text1 = chart1.mark_text(
-        align='left',
-        baseline='middle',
-        dx=3
-    ).encode(
-        text='Quantidade:Q'
-    )
+    st.header("Abastecimentos por Empilhador")
 
-    st.altair_chart(chart1 + text1, use_container_width=True)
-else:
-    st.info("Nenhum dado disponível para os filtros selecionados.")
+    total_abastecimento = df_filtrado.groupby('Úsuario').size().reset_index(name='Quantidade').sort_values(by='Quantidade', ascending=False)
+
+    if not total_abastecimento.empty:
+        chart1 = alt.Chart(total_abastecimento).mark_bar().encode(
+            y=alt.Y('Úsuario:N', sort='-x', title='Empilhador'),
+            x=alt.X('Quantidade:Q', title='Quantidade de Abastecimentos'),
+            tooltip=['Úsuario', 'Quantidade']
+        ).properties(
+            width=600,
+            height=300
+        )
+
+        text1 = chart1.mark_text(
+            align='left',
+            baseline='middle',
+            dx=3
+        ).encode(
+            text='Quantidade:Q'
+        )
+
+        st.altair_chart(chart1 + text1, use_container_width=True)
+    else:
+        st.info("Nenhum dado disponível para os filtros selecionados.")
+
 
     st.divider()
 
-st.header("2️⃣ Total de Abastecimentos por Setor")
+            # --- Ranking de Produtos Abastecidos ---
+    st.header("Produtos mais Abastecidos")
 
-total_setores = df_filtrado.groupby('Setor').size().reset_index(name='Total').sort_values(by='Total', ascending=False)
+    produtos = df_filtrado.groupby(['Cód.Produto', 'Descrição']).size().reset_index(name='Total').sort_values(by='Total', ascending=False).head(10)
 
-if not total_setores.empty:
-    chart2 = alt.Chart(total_setores).mark_bar().encode(
-        x=alt.X('Setor:N', title='Setor', sort='-y'),
-        y=alt.Y('Total:Q', title='Total de Abastecimentos'),
-        color=alt.Color('Setor:N', legend=None),
-        tooltip=['Setor', 'Total']
-    ).properties(
-        width=500,
-        height=400
-    )
+    if not produtos.empty:
+        chart3 = alt.Chart(produtos).mark_bar().encode(
+            y=alt.Y('Descrição:N', sort='-x', title='Produto'),
+            x=alt.X('Total:Q', title='Quantidade Abastecida'),
+            tooltip=['Cód.Produto', 'Descrição', 'Total']
+        ).properties(
+            width=600,
+            height=400
+        )
 
-    text2 = chart2.mark_text(
-        align='center',
-        baseline='bottom',
-        dy=-2
-    ).encode(
-        text='Total:Q'
-    )
+        text3 = chart3.mark_text(
+            align='left',
+            baseline='middle',
+            dx=3
+        ).encode(
+            text='Total:Q'
+        )
 
-    st.altair_chart(chart2 + text2, use_container_width=True)
-else:
-    st.info("Nenhum dado disponível para os filtros selecionados.")
+        st.altair_chart(chart3 + text3, use_container_width=True)
+    else:
+        st.info("Nenhum dado disponível para os filtros selecionados.")
+
+
 
 with col2:
-    # --- Ranking de Produtos Abastecidos ---
-st.header("3️⃣ Top 10 Produtos mais Abastecidos")
+    st.write("")
+    st.write("")
+    st.write("")
+    st.write("")
+    st.write("")
+    st.write("")
+    st.write("")
+    st.write("")
+    st.write("")
 
-produtos = df_filtrado.groupby(['Cód.Produto', 'Descrição']).size().reset_index(name='Total').sort_values(by='Total', ascending=False).head(10)
+    st.header("Abastecimentos por Setor")
 
-if not produtos.empty:
-    chart3 = alt.Chart(produtos).mark_bar().encode(
-        y=alt.Y('Descrição:N', sort='-x', title='Produto'),
-        x=alt.X('Total:Q', title='Quantidade Abastecida'),
-        tooltip=['Cód.Produto', 'Descrição', 'Total']
-    ).properties(
-        width=600,
-        height=400
-    )
+    total_setores = df_filtrado.groupby('Setor').size().reset_index(name='Total').sort_values(by='Total', ascending=False)
 
-    text3 = chart3.mark_text(
-        align='left',
-        baseline='middle',
-        dx=3
-    ).encode(
-        text='Total:Q'
-    )
+    if not total_setores.empty:
+        chart2 = alt.Chart(total_setores).mark_bar().encode(
+            x=alt.X('Setor:N', title='Setor', sort='-y'),
+            y=alt.Y('Total:Q', title='Total de Abastecimentos'),
+            color=alt.Color('Setor:N', legend=None),
+            tooltip=['Setor', 'Total']
+        ).properties(
+            width=500,
+            height=400
+        )
 
-    st.altair_chart(chart3 + text3, use_container_width=True)
-else:
-    st.info("Nenhum dado disponível para os filtros selecionados.")
+        text2 = chart2.mark_text(
+            align='center',
+            baseline='bottom',
+            dy=-2
+        ).encode(
+            text='Total:Q'
+        )
+
+        st.altair_chart(chart2 + text2, use_container_width=True)
+    else:
+        st.info("Nenhum dado disponível para os filtros selecionados.")
+            
+        
 
 
 

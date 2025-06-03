@@ -60,7 +60,18 @@ df_filtrado = df_filtrado[
 st.title("📊 Dashboard de Abastecimentos")
 
 # --- Total de Abastecimentos por Empilhador ---
-st.header("1️⃣ Total de Abastecimentos por Empilhador")
+
+
+# --- Total de Abastecimentos por Setor ---
+
+
+
+
+col1, col2 = st.columns(2)
+
+with col1:
+
+    st.header("1️⃣ Total de Abastecimentos por Empilhador")
 
 total_abastecimento = df_filtrado.groupby('Úsuario').size().reset_index(name='Quantidade').sort_values(by='Quantidade', ascending=False)
 
@@ -86,7 +97,8 @@ if not total_abastecimento.empty:
 else:
     st.info("Nenhum dado disponível para os filtros selecionados.")
 
-# --- Total de Abastecimentos por Setor ---
+    st.divider()
+
 st.header("2️⃣ Total de Abastecimentos por Setor")
 
 total_setores = df_filtrado.groupby('Setor').size().reset_index(name='Total').sort_values(by='Total', ascending=False)
@@ -114,7 +126,8 @@ if not total_setores.empty:
 else:
     st.info("Nenhum dado disponível para os filtros selecionados.")
 
-# --- Ranking de Produtos Abastecidos ---
+with col2:
+    # --- Ranking de Produtos Abastecidos ---
 st.header("3️⃣ Top 10 Produtos mais Abastecidos")
 
 produtos = df_filtrado.groupby(['Cód.Produto', 'Descrição']).size().reset_index(name='Total').sort_values(by='Total', ascending=False).head(10)
@@ -140,3 +153,6 @@ if not produtos.empty:
     st.altair_chart(chart3 + text3, use_container_width=True)
 else:
     st.info("Nenhum dado disponível para os filtros selecionados.")
+
+
+

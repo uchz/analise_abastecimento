@@ -16,6 +16,7 @@ def setor (rua):
 ## Total de Abastecimentos por Empilhador.
 
 total_abastecimento = df.groupby('Úsuario').size().reset_index(name='Quantidade').sort_values(by='Quantidade', ascending=False)
+total_abastecimento
 # %%
 #Produtos abastecimentos mais vezes
 pr_visitados = df.groupby('Cód.Produto')['Descrição'].value_counts().reset_index(name='Total').sort_values(by='Total', ascending=False)
@@ -53,3 +54,7 @@ df['Temp.Abastecimento'] = (df['Data Final'] - df['Data Inicial']).dt.total_seco
 # %%
 
 # %%
+
+# %%
+import streamlit as st
+

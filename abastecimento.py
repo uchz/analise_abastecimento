@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 
+st.set_page_config(layout="wide")
 # --- Carregar dados ---
 df = pd.read_excel('ABASTECIMENTOS.xlsx')
 

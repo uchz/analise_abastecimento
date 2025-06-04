@@ -25,6 +25,9 @@ df['Data Inicial'] = pd.to_datetime(df['Data Inicial'], format="%d/%m/%Y %H:%M:%
 df['Data Final'] = pd.to_datetime(df['Data Final'], format="%d/%m/%Y %H:%M:%S")
 df['Temp.Abastecimento'] = (df['Data Final'] - df['Data Inicial']).dt.total_seconds() / 60
 
+
+
+
 # --- Filtros ---
 st.sidebar.header("🔍 Filtros")
 
@@ -33,8 +36,8 @@ setores = ['Todos'] + df['Setor'].unique().tolist()
 setor_selecionado = st.sidebar.selectbox("Selecione o Setor", setores)
 
 # Filtro Data
-data_min = df['Data Inicial'].min().date()
-data_max = df['Data Final'].max().date()
+data_min = df['DATA'].min().date()
+data_max = df['DATA'].max().date()
 
 data_inicio = st.sidebar.date_input("Data Inicial", data_min)
 data_fim = st.sidebar.date_input("Data Final", data_max)
@@ -57,9 +60,11 @@ df_filtrado = df_filtrado[
     (df_filtrado['Data Final'].dt.date <= data_fim)
 ]
 
+abastecimentos_por_dia = df_filtrado.groupby('DATA').size().reset_index(name='Total Abastecimentos')
+
 total_abastecimentos = df_filtrado.shape[0]
 
-st.title("Dashboard de Abastecimentos")
+st.title("Abastecimentos Operação Noturna")
 
 
 # --- Total de Abastecimentos por Setor ---
@@ -160,15 +165,32 @@ with col1:
 
 
 with col2:
-    st.write("")
-    st.write("")
-    st.write("")
-    st.write("")
-    st.write("")
-    st.write("")
-    st.write("")
-    st.write("")
-    st.write("")
+    media_tempo = df_filtrado['Temp.Abastecimento'].mean()
+
+    st.markdown(
+        f"""
+        <div style="
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 120px;
+            width: 100%;
+            background-color: #FFFAFA;
+            border-radius: 15px;
+            box-shadow: 3px 3px 20px rgba(0, 0, 0, 0.1);
+            font-size: 18px;
+            font-weight: bold;
+            color: black;
+            text-align: center;
+            padding: 16px;
+            margin-bottom: 20px;">
+            <div>Média de Tempo por Abastecimento</div>
+            <div style="font-size: 32px; margin-top: 10px;">{media_tempo:.2f} min</div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
     st.header("Abastecimentos por Setor")
 
@@ -197,7 +219,36 @@ with col2:
     else:
         st.info("Nenhum dado disponível para os filtros selecionados.")
             
-        
+    st.divider()
+
+    line = alt.Chart(abastecimentos_por_dia).mark_line(point=True, color='steelblue').encode(
+    x=alt.X('DATA:T', title='Data', axis=alt.Axis(format='%d/%m')),
+    y=alt.Y('Total Abastecimentos:Q', title='Total de Abastecimentos'),
+    tooltip=['DATA', 'Total Abastecimentos']
+    )
+
+    # Rótulos de dados
+    text = alt.Chart(abastecimentos_por_dia).mark_text(
+        align='center',
+        baseline='bottom',
+        dy=-10,
+        color='black'
+    ).encode(
+        x='DATA:T',
+        y='Total Abastecimentos:Q',
+        text=alt.Text('Total Abastecimentos:Q', format='.0f')
+    )
+
+    # Combina linha e texto
+    chart = (line + text).properties(
+        title='Abastecimentos por Dia no Mês',
+        width=700,
+        height=400
+    )
+
+    # Exibe no Streamlit
+    st.altair_chart(chart, use_container_width=True)
 
 
-
+print(abastecimentos_por_dia.dtypes)
+print(abastecimentos_por_dia.head())

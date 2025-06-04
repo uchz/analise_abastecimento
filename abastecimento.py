@@ -242,7 +242,7 @@ with col2:
 
     # Combina linha e texto
     chart = (line + text).properties(
-        title='Abastecimentos por Dia no Mês',
+        title='Abastecimentos por Dia',
         width=700,
         height=400
     )
@@ -251,5 +251,3 @@ with col2:
     st.altair_chart(chart, use_container_width=True)
 
 
-print(abastecimentos_por_dia.dtypes)
-print(abastecimentos_por_dia.head())

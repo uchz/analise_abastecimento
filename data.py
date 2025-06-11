@@ -56,5 +56,28 @@ df['Temp.Abastecimento'] = (df['Data Final'] - df['Data Inicial']).dt.total_seco
 # %%
 
 # %%
-import streamlit as st
+import matplotlib.pyplot as plt
 
+# Dados
+labels = ['Fora da Zona de Armazenagem', 'Dentro da Zona de Armazenagem']
+valores = [38, 171]
+cores = ['#66c2a5', '#b3b3b3']
+
+# Gráfico de pizza
+fig, ax = plt.subplots(figsize=(6, 6))
+wedges, texts, autotexts = ax.pie(
+    valores, labels=labels, colors=cores, autopct='%.1f%%', startangle=90,
+    wedgeprops=dict(width=0.4)  # Donut
+)
+
+# Título
+plt.title('Distribuição dos Abastecimentos (Total = 209)', fontsize=14)
+plt.axis('equal')  # Mantém o círculo redondo
+plt.tight_layout()
+plt.show()
+
+
+
+# %%
+total = 209
+fora = 38
